@@ -1,0 +1,6 @@
+pandas
+flask
+flask-cors
+google-generativeai
+googlesearch-python
+python-dotenv
