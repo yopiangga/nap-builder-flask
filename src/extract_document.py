@@ -42,6 +42,15 @@ class ExtractDocument():
         
             Return only json value schema, 1 dimension array.
 
+            In last section, get total of the section.
+            example : 
+            {
+                title: 'total_aset_lancar',
+                value_year_2020: int,
+                value_year_2021: int,
+                value_year_2022: int
+            }
+
             example :
             [
                 {
@@ -64,6 +73,15 @@ class ExtractDocument():
             Value must be integer with real number without formating.
         
             Return only json value schema, 1 dimension array.
+
+            In last section, get total of the section.
+            example : 
+            {
+                title: 'total_aset_tidak_lancar',
+                value_year_2020: int,
+                value_year_2021: int,
+                value_year_2022: int
+            }
 
             example :
             [
@@ -88,6 +106,15 @@ class ExtractDocument():
             
             Return only json value schema, 1 dimension array.
 
+            In last section, get total of the section.
+            example : 
+            {
+                title: 'total_liabilitas_jangka_pendek',
+                value_year_2020: int,
+                value_year_2021: int,
+                value_year_2022: int
+            }
+            
             example :
             [
                 {
@@ -111,6 +138,15 @@ class ExtractDocument():
         
             Return only json value schema, 1 dimension array.
 
+            In last section, get total of the section.
+            example : 
+            {
+                title: 'total_liabilitas_jangka_panjang',
+                value_year_2020: int,
+                value_year_2021: int,
+                value_year_2022: int
+            }
+
             example :
             [
                 {
@@ -133,6 +169,15 @@ class ExtractDocument():
             Value must be integer with real number without formating.
         
             Return only json value schema, 1 dimension array.
+
+            In last section, get total of the section.
+            example : 
+            {
+                title: 'total_ekuitas',
+                value_year_2020: int,
+                value_year_2021: int,
+                value_year_2022: int
+            }
 
             example :
             [
@@ -170,7 +215,7 @@ class ExtractDocument():
         return df_json[["title", "value_year_2020", "value_year_2021", "value_year_2022"]]
 
     def get_summ(self, df_json):
-        df_summ = df_json.copy()
+        df_summ = df_json[~df_json["title"].str.contains('total_')].copy()
         df_summ["akumulasi"] = df_summ.apply(lambda x: x["value_year_2020"] + x["value_year_2021"] + x["value_year_2022"], axis=1)
         
         df_summ = df_summ.sort_values(by="akumulasi", ascending=False)
@@ -190,12 +235,14 @@ class ExtractDocument():
         
         df_with_other = pd.concat([df_with_other, df_s])
         
-        df_temp = pd.DataFrame(columns=["title", "value_year_2020", "value_year_2021", "value_year_2022"])
-        df_temp["title"] = ["Total"]
-        t1, t2, t3 = [df_with_other["value_year_2020"].sum(), df_with_other["value_year_2021"].sum(), df_with_other["value_year_2022"].sum()]
-        df_temp["value_year_2020"] = [t1]
-        df_temp["value_year_2021"] = [t2]
-        df_temp["value_year_2022"] = [t3]
+        # df_temp = pd.DataFrame(columns=["title", "value_year_2020", "value_year_2021", "value_year_2022"])
+        # df_temp["title"] = ["Total"]
+        # t1, t2, t3 = [df_with_other["value_year_2020"].sum(), df_with_other["value_year_2021"].sum(), df_with_other["value_year_2022"].sum()]
+        # df_temp["value_year_2020"] = [t1]
+        # df_temp["value_year_2021"] = [t2]
+        # df_temp["value_year_2022"] = [t3]
+
+        df_temp = df_json[df_json["title"].str.contains('total_')].copy()
         
         df_with_other = pd.concat([df_with_other, df_temp])
         

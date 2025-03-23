@@ -1,6 +1,6 @@
 ,title,value_year_2020,value_year_2021,value_year_2022
-0,Liabilitas jangka panjang,15709999,10249381,8926993
-2,Pinjaman bank,2468375,5350875,2821000
-1,Liabilitas imbalan kerja,506238,633186,781720
-0,Lainnya,880446,679868,21355
-0,Total,19565058,16913310,12551068
+3,"Utang jangka panjang, setelah dikurangi bagian jangka pendek",7757750.0,10078232.0,2497075.0
+0,Liabilitas pajak tangguhan,3256671.0,4071332.0,3241216.0
+2,Liabilitas imbalan kerja,3155268.0,2531565.0,3315595.0
+0,Lainnya,1540310.0,1336643.0,1436471.0
+7,total_liabilitas_jangka_panjang,15709999.0,18017772.0,8729158.0
