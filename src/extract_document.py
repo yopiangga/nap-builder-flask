@@ -2,6 +2,7 @@ import google.generativeai as genai
 import json
 import pandas as pd
 import os
+from googlesearch import search
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -166,7 +167,7 @@ class ExtractDocument():
         json_data = json.loads(clean_json_string)
         df_json = pd.DataFrame(json_data)
 
-        return df_json
+        return df_json[["title", "value_year_2020", "value_year_2021", "value_year_2022"]]
 
     def get_summ(self, df_json):
         df_summ = df_json.copy()
@@ -200,19 +201,21 @@ class ExtractDocument():
         
         return df_with_other
     
-    def get_descriptive_analyst(self, data):
+    def get_descriptive_analyst(self, data, link):
         promt = """
-           Jelaskan data arus kas dan setara kas dari UNTR berikut ini
-            """ \
-            + data + \
+           Jelaskan data laporan keuangan dari UNTR berikut ini
+            Data: 
+            {0}
+            
+            Gunakan data dari referensi berita untuk menjelaskan data yang ada, jika tidak ada maka gunakan laporan keuangan sebagai penjelasan mengapa hal itu terjadi.
+        
+
+            """.format(data, link)
+
+        promt = promt + \
             """
-        
-            Gunakan data dari internet untuk mendaoatkan informasi pendukung kenapa terjadi kenaikan dan penurunan.
-            Jangan berikan jawaban yang belum pasti.
-            Gunakan unggahan berita sebagai penjelasan.
-        
             Return json data only.
-        
+            
             return schema:
             [
                 {
@@ -221,11 +224,16 @@ class ExtractDocument():
                     reference: str
                 }
             ]
-    
-        """
+            """
 
-        response = self.model.generate_content([self.online_path + [promt]])
-        return response  
+        response = self.model.generate_content(self.online_path + link + [promt])
+        return response 
+
+    def news_reference(self):
+        link = []
+        for j in search("UNTR Financial News 2020 - 2022", sleep_interval=2, num_results=20):
+            link.append(j)
+        return link
     
     def main(self):
         aset_lancar = self.get_genai_extract("aset_lancar")
@@ -246,8 +254,13 @@ class ExtractDocument():
             ekuitas
         ])
 
-        # descriptive = self.get_descriptive_analyst(str(df_data.to_dict(orient='records')))
+        links = self.news_reference()
 
+        descriptive = self.get_descriptive_analyst(str(df_data.to_dict(orient='records')), links)
+        json_string = descriptive.text
+        clean_json_string = json_string.strip("```json\n").strip("```")
+        json_data = json.loads(clean_json_string)
+        df_descriptive = pd.DataFrame(json_data)
 
-        return aset_lancar_summ, aset_tidak_lancar_summ, liabilitas_jangka_panjang_summ, liabilitas_jangka_pendek_summ, ekuitas_summ
+        return [aset_lancar_summ, aset_tidak_lancar_summ, liabilitas_jangka_panjang_summ, liabilitas_jangka_pendek_summ, ekuitas_summ, df_descriptive]
             
